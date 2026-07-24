@@ -1,16 +1,22 @@
 import os
 import requests
 
-UPSTOX_ACCESS_TOKEN = os.getenv("UPSTOX_ACCESS_TOKEN")
+ACCESS_TOKEN = os.getenv("UPSTOX_ACCESS_TOKEN")
 
 headers = {
     "Accept": "application/json",
-    "Authorization": f"Bearer {UPSTOX_ACCESS_TOKEN}"
+    "Authorization": f"Bearer {ACCESS_TOKEN}"
 }
 
-url = "https://api.upstox.com/v3/market-quote/quotes?instrument_key=BSE_INDEX|SENSEX"
+url = "https://api.upstox.com/v2/instruments/search"
 
-response = requests.get(url, headers=headers)
+params = {
+    "query": "SENSEX",
+    "segments": "INDEX",
+    "exchanges": "BSE"
+}
+
+response = requests.get(url, headers=headers, params=params)
 
 print(response.status_code)
 print(response.text)
