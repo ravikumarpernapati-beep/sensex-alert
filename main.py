@@ -8,15 +8,11 @@ headers = {
     "Authorization": f"Bearer {ACCESS_TOKEN}"
 }
 
-url = "https://api.upstox.com/v2/instruments/search"
+instrument_key = "BSE_INDEX|SENSEX"
 
-params = {
-    "query": "SENSEX",
-    "segments": "INDEX",
-    "exchanges": "BSE"
-}
+url = f"https://api.upstox.com/v2/historical-candle/{instrument_key}/5minute"
 
-response = requests.get(url, headers=headers, params=params)
+response = requests.get(url, headers=headers)
 
 print(response.status_code)
 print(response.text)
