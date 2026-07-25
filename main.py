@@ -80,10 +80,14 @@ def market_open():
 # GET CANDLES
 # ==========================
 
-def get_candles():
+def get_candles(interval=5):
 
-    response = requests.get(
-        URL,
+    url = (
+    "https://api.upstox.com/v3/historical-candle/intraday/"
+    f"{INSTRUMENT_KEY}/minutes/{interval}"
+)
+        response = requests.get(
+        url
         headers=HEADERS,
         timeout=20
     )
