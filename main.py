@@ -180,14 +180,10 @@ def check_signal(df):
 
 def main():
 
-    print("Testing API")
-
-    df = get_candles()
-
-    print(df.tail(5).to_string())
-
-    return
-
+    if not market_open():
+        print("Market Closed")
+        return
+        
     df = get_candles()
     df = add_bollinger(df)
     signal = check_signal(df)
