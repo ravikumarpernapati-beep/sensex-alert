@@ -194,10 +194,14 @@ def main():
 
     state = load_state()
 
-    
     if signal is None:
         print("No Signal")
         return
+
+    state["last_signal"] = f"{signal['signal']}_{signal['time']}"
+    state["pending_signal"] = signal["signal"]
+    state["pending_time"] = signal["time"]
+    save_state(state)
 
     message = (
         f"📢 SENSEX ALERT\n\n"
