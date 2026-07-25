@@ -194,21 +194,21 @@ def main():
 
     state = load_state()
 
-if signal is None:
+    if signal is None:
     print("No Signal")
     return
 
-current_signal = f"{signal['signal']}_{signal['time']}"
+    current_signal = f"{signal['signal']}_{signal['time']}"
 
-if state.get("last_signal") == current_signal:
+    if state.get("last_signal") == current_signal:
     print("Duplicate Signal")
     return
 
-state["last_signal"] = current_signal
-state["pending_signal"] = signal["signal"]
-state["pending_time"] = signal["time"]
+    state["last_signal"] = current_signal
+    state["pending_signal"] = signal["signal"]
+    state["pending_time"] = signal["time"]
 
-save_state(state)
+    save_state(state)
 message = (
         f"📢 SENSEX ALERT\n\n"
         f"Signal : {signal['signal']}\n"
