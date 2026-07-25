@@ -2,7 +2,9 @@ name: Sensex Alert Bot
 
 on:
   schedule:
-    - cron: "*/5 * * * 1-5"
+    - cron: "45 3 * * 1-5"
+    - cron: "*/5 4-9  * * 1-5"
+    - cron: "0,5,10,15,20,25,30 10 * * 1-5"
   workflow_dispatch:
 
 jobs:
