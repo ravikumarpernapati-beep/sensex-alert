@@ -87,3 +87,48 @@ def get_candles():
     df["close"] = df["close"].astype(float)
 
     return df
+    
+    # ==========================
+# BOLLINGER BANDS
+# ==========================
+
+def add_bollinger(df):
+
+    df["ma20"] = df["close"].rolling(20).mean()
+
+    df["std"] = df["close"].rolling(20).std()
+
+    df["upper"] = df["ma20"] + (2 * df["std"])
+
+    df["lower"] = df["ma20"] - (2 * df["std"])
+
+    return df
+
+
+# ==========================
+# SIGNAL LOGIC
+# ==========================
+
+def check_signal(df):
+
+    if len(df) < 21:
+        return None
+
+    last = df.iloc[-2]      # Last CLOSED candle
+    prev = df.iloc[-3]
+
+    # BUY CE
+    if (
+        prev["close"] < prev["ma20"]
+        and last["close"] > last["ma20"]
+    ):
+        return "BUY CE"
+
+    # BUY PE
+    if (
+        prev["close"] > prev["ma20"]
+        and last["close"] < last["ma20"]
+    ):
+        return "BUY PE"
+
+    return None
