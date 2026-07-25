@@ -218,9 +218,9 @@ message = (
         f"Status : Waiting for 15m Confirmation"
     )
 
-    print(message)
+print(message)
 
-    send_telegram(message)
+send_telegram(message)
 
 if __name__ == "__main__":
 
