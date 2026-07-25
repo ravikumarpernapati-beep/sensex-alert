@@ -140,8 +140,9 @@ def check_signal(df):
 def main():
 
     if not market_open():
-        print("Testing Mode")
-        return
+    print("Testing Mode")
+    send_telegram("✅ Telegram Test Message")
+    return
 
     df = get_candles()
 
