@@ -201,8 +201,8 @@ def main():
     current_signal = f"{signal['signal']}_{signal['time']}"
 
     if state.get("last_signal") == current_signal:
-    print("Duplicate Signal")
-    return
+        print("Duplicate Signal")
+        return
 
     state["last_signal"] = current_signal
     state["pending_signal"] = signal["signal"]
