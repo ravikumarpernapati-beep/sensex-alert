@@ -165,7 +165,7 @@ def main():
     send_telegram(message)
 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
 
     try:
         main()
