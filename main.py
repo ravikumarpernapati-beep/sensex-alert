@@ -195,8 +195,8 @@ def main():
     state = load_state()
 
     if signal is None:
-    print("No Signal")
-    return
+        print("No Signal")
+        return
 
     current_signal = f"{signal['signal']}_{signal['time']}"
 
