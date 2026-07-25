@@ -139,9 +139,15 @@ def check_signal(df):
 
 def main():
 
-    if not market_open():
-        print("Market Closed")
-        return
+    print("Testing API")
+
+    df = get_candles()
+
+    print(df.tail())
+
+    send_telegram("✅ API Working")
+
+    return
 
     df = get_candles()
     df = add_bollinger(df)
