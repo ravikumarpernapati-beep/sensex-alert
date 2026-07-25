@@ -194,17 +194,7 @@ def main():
 
     state = load_state()
 
-    if signal is not None:
-
-        current_id = f"{signal['signal']}_{signal['time']}"
-
-    if state.get("last_signal") == current_id:
-                print("Duplicate Signal Ignored")
-                return
-
-        state["last_signal"] = current_id
-        save_state(state)
-
+    
     if signal is None:
         print("No Signal")
         return
@@ -220,7 +210,6 @@ def main():
     print(message)
 
     send_telegram(message)
-
 
 if __name__ == "__main__":
 
