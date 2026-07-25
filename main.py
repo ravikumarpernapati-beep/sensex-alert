@@ -132,3 +132,46 @@ def check_signal(df):
         return "BUY PE"
 
     return None
+
+# ==========================
+# MAIN
+# ==========================
+
+def main():
+
+    if not market_open():
+        print("Market Closed")
+        return
+
+    df = get_candles()
+
+    df = add_bollinger(df)
+
+    signal = check_signal(df)
+
+    if signal is None:
+        print("No Signal")
+        return
+
+    message = (
+        f"📢 SENSEX ALERT\n\n"
+        f"Signal : {signal}\n"
+        f"Price : {df.iloc[-2]['close']}\n"
+        f"Time   : {df.iloc[-2]['time']}"
+    )
+
+    print(message)
+
+    send_telegram(message)
+
+
+if _name_ == "_main_":
+
+    try:
+        main()
+
+    except Exception as e:
+
+        print(e)
+
+        send_telegram(f"❌ Bot Error\n\n{e}")
