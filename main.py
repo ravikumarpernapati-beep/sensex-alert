@@ -114,9 +114,47 @@ def add_bollinger(df):
 
 def check_signal(df):
 
+    # Minimum candles required
     if len(df) < 21:
         return None
 
+    # Use only CLOSED candles
+    prev = df.iloc[-3]
+    last = df.iloc[-2]
+
+    # Ignore if Bollinger values are not ready
+    if (
+        pd.isna(prev["ma20"]) or
+        pd.isna(last["ma20"])
+    ):
+        return None
+
+    # BUY CE
+    if (
+        prev["close"] <= prev["ma20"] and
+        last["close"] > last["ma20"]
+    ):
+        return {
+            "signal": "BUY CE",
+            "price": last["close"],
+            "time": last["time"],
+            "band": last["ma20"]
+        }
+
+    # BUY PE
+    if (
+        prev["close"] >= prev["ma20"] and
+        last["close"] < last["ma20"]
+    ):
+        return {
+            "signal": "BUY PE",
+            "price": last["close"],
+            "time": last["time"],
+            "band": last["ma20"]
+        }
+
+    return None
+    
     last = df.iloc[-2]      # Last CLOSED candle
     prev = df.iloc[-3]
 
@@ -160,11 +198,12 @@ def main():
 
     message = (
         f"📢 SENSEX ALERT\n\n"
-        f"Signal : {signal}\n"
-        f"Price : {df.iloc[-2]['close']}\n"
-        f"Time   : {df.iloc[-2]['time']}"
-    )
-
+        f"Signal : {signal['signal']}\n"
+        f"Price  : {signal['price']}\n"
+        f"Time   : {signal['time']}\n"
+        f"MA20   : {round(signal['band'], 2)}\n\n"
+        f"Status : Waiting for 15m Confirmation"
+)
     print(message)
 
     send_telegram(message)
