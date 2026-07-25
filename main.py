@@ -140,7 +140,7 @@ def check_signal(df):
 def main():
 
     if not market_open():
-        print("Market Closed")
+        print("Testing Mode")
         return
 
     df = get_candles()
