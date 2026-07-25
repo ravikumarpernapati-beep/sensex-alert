@@ -209,15 +209,15 @@ state["pending_signal"] = signal["signal"]
 state["pending_time"] = signal["time"]
 
 save_state(state)
-
-    message = (
+message = (
         f"📢 SENSEX ALERT\n\n"
         f"Signal : {signal['signal']}\n"
         f"Price  : {signal['price']}\n"
         f"Time   : {signal['time']}\n"
         f"MA20   : {round(signal['band'], 2)}\n\n"
         f"Status : Waiting for 15m Confirmation"
-)
+    )
+
     print(message)
 
     send_telegram(message)
