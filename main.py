@@ -1,4 +1,5 @@
 import os
+import json
 import requests
 import pandas as pd
 import numpy as np
@@ -24,6 +25,7 @@ HEADERS = {
     "Authorization": f"Bearer {UPSTOX_ACCESS_TOKEN}"
 }
 
+STATE_FILE = "signal_state.json"
 
 # ==========================
 # TELEGRAM
@@ -41,6 +43,27 @@ def send_telegram(message):
         timeout=20
     )
 
+# ==========================
+# SIGNAL STATE
+# ==========================
+
+def load_state():
+
+    if not os.path.exists(STATE_FILE):
+        return {}
+
+    try:
+        with open(STATE_FILE, "r") as f:
+            return json.load(f)
+
+    except:
+        return {}
+
+
+def save_state(state):
+
+    with open(STATE_FILE, "w") as f:
+        json.dump(state, f)
 
 # ==========================
 # MARKET HOURS
@@ -154,26 +177,7 @@ def check_signal(df):
         }
 
     return None
-    
-    last = df.iloc[-2]      # Last CLOSED candle
-    prev = df.iloc[-3]
-
-    # BUY CE
-    if (
-        prev["close"] < prev["ma20"]
-        and last["close"] > last["ma20"]
-    ):
-        return "BUY CE"
-
-    # BUY PE
-    if (
-        prev["close"] > prev["ma20"]
-        and last["close"] < last["ma20"]
-    ):
-        return "BUY PE"
-
-    return None
-
+        
 # ==========================
 # MAIN
 # ==========================
@@ -187,6 +191,19 @@ def main():
     df = get_candles()
     df = add_bollinger(df)
     signal = check_signal(df)
+
+    state = load_state()
+
+if signal is not None:
+
+    current_id = f"{signal['signal']}_{signal['time']}"
+
+    if state.get("last_signal") == current_id:
+        print("Duplicate Signal Ignored")
+        return
+
+    state["last_signal"] = current_id
+    save_state(state)
 
     if signal is None:
         print("No Signal")
