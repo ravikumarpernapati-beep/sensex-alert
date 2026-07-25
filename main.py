@@ -140,16 +140,16 @@ def check_signal(df):
 def main():
 
     if not market_open():
-    print("Market Closed")
-    return
+        print("Market Closed")
+        return
 
     df = get_candles()
     df = add_bollinger(df)
     signal = check_signal(df)
 
     if signal is None:
-    print("No Signal")
-    return
+        print("No Signal")
+        return
 
     message = (
         f"📢 SENSEX ALERT\n\n"
