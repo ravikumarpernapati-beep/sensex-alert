@@ -67,6 +67,9 @@ def get_candles():
 
     data = response.json()
 
+    print(response.status_code)
+    print(data)
+
     candles = data["data"]["candles"]
 
     df = pd.DataFrame(
