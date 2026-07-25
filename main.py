@@ -198,9 +198,9 @@ def main():
 
         current_id = f"{signal['signal']}_{signal['time']}"
 
-        if state.get("last_signal") == current_id:
-        print("Duplicate Signal Ignored")
-        return
+            if state.get("last_signal") == current_id:
+                print("Duplicate Signal Ignored")
+                return
 
         state["last_signal"] = current_id
     save_state(state)
