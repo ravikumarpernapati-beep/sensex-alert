@@ -81,17 +81,17 @@ def market_open():
 # ==========================
 
 def get_candles(interval=5):
-
+    ...
     url = (
-    "https://api.upstox.com/v3/historical-candle/intraday/"
-    f"{INSTRUMENT_KEY}/minutes/{interval}"
-)
-        response = requests.get(
-        url
+        ...
+    )
+
+    response = requests.get(
+        url,
         headers=HEADERS,
         timeout=20
     )
-
+    
     data = response.json()
 
     print(response.status_code)
