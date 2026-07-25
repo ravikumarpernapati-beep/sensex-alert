@@ -209,7 +209,7 @@ def main():
     state["pending_time"] = signal["time"]
 
     save_state(state)
-message = (
+    message = (
         f"📢 SENSEX ALERT\n\n"
         f"Signal : {signal['signal']}\n"
         f"Price  : {signal['price']}\n"
@@ -218,9 +218,9 @@ message = (
         f"Status : Waiting for 15m Confirmation"
     )
 
-print(message)
+    print(message)
 
-send_telegram(message)
+    send_telegram(message)
 
 if __name__ == "__main__":
 
