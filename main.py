@@ -182,7 +182,29 @@ def check_signal(df):
         }
 
     return None
-        
+
+# ==========================
+# 15M CONFIRMATION
+# ==========================
+
+def check_confirmation(df15, pending_signal):
+
+    if len(df15) < 21:
+        return None
+
+    last = df15.iloc[-2]
+
+    if pd.isna(last["ma20"]):
+        return None
+
+    if pending_signal == "BUY CE":
+        return last["close"] > last["ma20"]
+
+    if pending_signal == "BUY PE":
+        return last["close"] < last["ma20"]
+
+    return False
+
 # ==========================
 # MAIN
 # ==========================
