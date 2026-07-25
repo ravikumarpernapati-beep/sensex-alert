@@ -254,11 +254,11 @@ if state.get("pending_signal"):
         state["pending_time"] = ""
 
         save_state(state)
-    
+
     if signal is None:
         print("No Signal")
         return
-
+        
     current_signal = f"{signal['signal']}_{signal['time']}"
 
     if state.get("last_signal") == current_signal:
