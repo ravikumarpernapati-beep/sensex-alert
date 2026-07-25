@@ -143,9 +143,7 @@ def main():
 
     df = get_candles()
 
-    print(df.tail())
-
-    send_telegram("✅ API Working")
+    print(df.tail(5).to_string())
 
     return
 
