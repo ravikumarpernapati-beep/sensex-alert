@@ -221,6 +221,40 @@ def main():
 
     state = load_state()
 
+# Check pending 15-minute confirmation
+
+if state.get("pending_signal"):
+
+    df15 = get_candles(15)
+    df15 = add_bollinger(df15)
+
+    confirmed = check_confirmation(
+        df15,
+        state["pending_signal"]
+    )
+
+    if confirmed is True:
+
+        send_telegram(
+            f"✅ 15M CONFIRMED\n\n{state['pending_signal']}"
+        )
+
+        state["pending_signal"] = ""
+        state["pending_time"] = ""
+
+        save_state(state)
+
+    elif confirmed is False:
+
+        send_telegram(
+            f"❌ 15M REJECTED\n\n{state['pending_signal']}"
+        )
+
+        state["pending_signal"] = ""
+        state["pending_time"] = ""
+
+        save_state(state)
+    
     if signal is None:
         print("No Signal")
         return
