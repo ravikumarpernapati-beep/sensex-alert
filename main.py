@@ -139,7 +139,6 @@ def check_signal(df):
 
 def main():
 
-    if not market_open():
     print("Testing Mode")
     send_telegram("✅ Telegram Test Message")
     return
