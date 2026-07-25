@@ -223,7 +223,7 @@ def main():
 
 # Check pending 15-minute confirmation
 
-if state.get("pending_signal"):
+    if state.get("pending_signal"):
 
     df15 = get_candles(15)
     df15 = add_bollinger(df15)
