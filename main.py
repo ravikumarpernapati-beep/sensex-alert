@@ -2,7 +2,6 @@ import os
 import json
 import requests
 import pandas as pd
-import numpy as np
 from datetime import datetime, time
 
 # ==========================
@@ -14,11 +13,6 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 UPSTOX_ACCESS_TOKEN = os.getenv("UPSTOX_ACCESS_TOKEN")
 
 INSTRUMENT_KEY = "BSE_INDEX|SENSEX"
-
-URL = (
-    "https://api.upstox.com/v3/historical-candle/intraday/"
-    f"{INSTRUMENT_KEY}/minutes/5"
-)
 
 HEADERS = {
     "Accept": "application/json",
@@ -32,6 +26,7 @@ STATE_FILE = "signal_state.json"
 # ==========================
 
 def send_telegram(message):
+
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
 
     requests.post(
@@ -50,20 +45,29 @@ def send_telegram(message):
 def load_state():
 
     if not os.path.exists(STATE_FILE):
-        return {}
+        return {
+            "last_signal": "",
+            "pending_signal": "",
+            "pending_time": ""
+        }
 
     try:
         with open(STATE_FILE, "r") as f:
             return json.load(f)
 
     except:
-        return {}
+        return {
+            "last_signal": "",
+            "pending_signal": "",
+            "pending_time": ""
+        }
 
 
 def save_state(state):
 
     with open(STATE_FILE, "w") as f:
-        json.dump(state, f)
+        json.dump(state, f, indent=4)
+
 
 # ==========================
 # MARKET HOURS
@@ -81,22 +85,19 @@ def market_open():
 # ==========================
 
 def get_candles(interval=5):
-    
+
     url = (
-    "https://api.upstox.com/v3/historical-candle/intraday/"
-    f"{INSTRUMENT_KEY}/minutes/{interval}"
-)
-    
+        "https://api.upstox.com/v3/historical-candle/intraday/"
+        f"{INSTRUMENT_KEY}/minutes/{interval}"
+    )
+
     response = requests.get(
         url,
         headers=HEADERS,
         timeout=20
     )
-    
-    data = response.json()
 
-    print(response.status_code)
-    print(data)
+    data = response.json()
 
     candles = data["data"]["candles"]
 
@@ -114,27 +115,24 @@ def get_candles(interval=5):
     )
 
     df = df.iloc[::-1].reset_index(drop=True)
-
     df["close"] = df["close"].astype(float)
 
     return df
-    
-    # ==========================
-# BOLLINGER BANDS
+
+
+# ==========================
+# BOLLINGER
 # ==========================
 
 def add_bollinger(df):
 
     df["ma20"] = df["close"].rolling(20).mean()
-
     df["std"] = df["close"].rolling(20).std()
 
     df["upper"] = df["ma20"] + (2 * df["std"])
-
     df["lower"] = df["ma20"] - (2 * df["std"])
 
     return df
-
 
 # ==========================
 # SIGNAL LOGIC
@@ -142,15 +140,12 @@ def add_bollinger(df):
 
 def check_signal(df):
 
-    # Minimum candles required
     if len(df) < 21:
         return None
 
-    # Use only CLOSED candles
     prev = df.iloc[-3]
     last = df.iloc[-2]
 
-    # Ignore if Bollinger values are not ready
     if (
         pd.isna(prev["ma20"]) or
         pd.isna(last["ma20"])
@@ -183,6 +178,7 @@ def check_signal(df):
 
     return None
 
+
 # ==========================
 # 15M CONFIRMATION
 # ==========================
@@ -214,62 +210,73 @@ def main():
     if not market_open():
         print("Market Closed")
         return
-        
+
+    # 5-Minute Data
     df = get_candles()
     df = add_bollinger(df)
     signal = check_signal(df)
 
     state = load_state()
 
-# Check pending 15-minute confirmation
-
+    # --------------------------
+    # Check Pending 15M Signal
+    # --------------------------
     if state.get("pending_signal"):
 
-    df15 = get_candles(15)
-    df15 = add_bollinger(df15)
+        df15 = get_candles(15)
+        df15 = add_bollinger(df15)
 
-    confirmed = check_confirmation(
-        df15,
-        state["pending_signal"]
-    )
-
-    if confirmed is True:
-
-        send_telegram(
-            f"✅ 15M CONFIRMED\n\n{state['pending_signal']}"
+        confirmed = check_confirmation(
+            df15,
+            state["pending_signal"]
         )
 
-        state["pending_signal"] = ""
-        state["pending_time"] = ""
+        if confirmed is True:
 
-        save_state(state)
+            send_telegram(
+                f"✅ 15M CONFIRMED\n\n{state['pending_signal']}"
+            )
 
-    elif confirmed is False:
+            state["pending_signal"] = ""
+            state["pending_time"] = ""
 
-        send_telegram(
-            f"❌ 15M REJECTED\n\n{state['pending_signal']}"
-        )
+            save_state(state)
 
-        state["pending_signal"] = ""
-        state["pending_time"] = ""
+        elif confirmed is False:
 
-        save_state(state)
+            send_telegram(
+                f"❌ 15M REJECTED\n\n{state['pending_signal']}"
+            )
 
+            state["pending_signal"] = ""
+            state["pending_time"] = ""
+
+            save_state(state)
+
+    # --------------------------
+    # No New Signal
+    # --------------------------
     if signal is None:
         print("No Signal")
         return
-        
+
     current_signal = f"{signal['signal']}_{signal['time']}"
 
+    # --------------------------
+    # Duplicate Check
+    # --------------------------
     if state.get("last_signal") == current_signal:
         print("Duplicate Signal")
         return
 
+    # Save New Signal
     state["last_signal"] = current_signal
     state["pending_signal"] = signal["signal"]
     state["pending_time"] = signal["time"]
 
     save_state(state)
+
+    # Telegram Alert
     message = (
         f"📢 SENSEX ALERT\n\n"
         f"Signal : {signal['signal']}\n"
@@ -283,6 +290,11 @@ def main():
 
     send_telegram(message)
 
+
+# ==========================
+# START
+# ==========================
+
 if __name__ == "__main__":
 
     try:
@@ -292,4 +304,6 @@ if __name__ == "__main__":
 
         print(e)
 
-        send_telegram(f"❌ Bot Error\n\n{e}")
+        send_telegram(
+            f"❌ Bot Error\n\n{e}"
+        )
