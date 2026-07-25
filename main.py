@@ -203,7 +203,7 @@ def main():
                 return
 
         state["last_signal"] = current_id
-    save_state(state)
+        save_state(state)
 
     if signal is None:
         print("No Signal")
