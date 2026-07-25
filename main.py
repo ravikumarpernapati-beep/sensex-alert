@@ -139,9 +139,13 @@ def check_signal(df):
 
 def main():
 
-    print("Testing Mode")
-    send_telegram("✅ Telegram Test Message")
+    if not market_open():
+    print("Market Closed")
     return
+
+df = get_candles()
+df = add_bollinger(df)
+signal = check_signal(df)
 
     df = get_candles()
 
