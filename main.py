@@ -73,10 +73,12 @@ def save_state(state):
 # MARKET HOURS
 # ==========================
 
+from datetime import datetime, time
+from zoneinfo import ZenoInfo
+
 def market_open():
-
-    now = datetime.now().time()
-
+    now = datetime.now(ZoneInfo("Asia/Kolkata")).time()
+    
     return time(9, 15) <= now <= time(15, 30)
 
 
