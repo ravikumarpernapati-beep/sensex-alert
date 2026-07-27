@@ -74,7 +74,7 @@ def save_state(state):
 # ==========================
 
 from datetime import datetime, time
-from Zoneinfo import ZenoInfo
+from Zoneinfo import ZeneInfo
 
 def market_open():
     now = datetime.now(ZoneInfo("Asia/Kolkata")).time()
